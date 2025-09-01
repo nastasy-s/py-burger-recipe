@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Type
+from typing import Any, Iterable, Tuple, Type
 
 
 class Validator(ABC):
@@ -27,6 +27,7 @@ class Number(Validator):
         self.max_value: int = max_value
 
     def validate(self, value: Any) -> None:
+        # bool є підкласом int — забороняємо як кількість інгредієнтів
         if not isinstance(value, int) or isinstance(value, bool):
             raise TypeError("Quantity should be integer.")
         if not (self.min_value <= value <= self.max_value):
@@ -37,8 +38,8 @@ class Number(Validator):
 
 
 class OneOf(Validator):
-    def __init__(self, *options: str) -> None:
-        self.options: tuple[str, ...] = tuple(options)
+    def __init__(self, options: Iterable[str]) -> None:
+        self.options: Tuple[str, ...] = tuple(options)
 
     def validate(self, value: Any) -> None:
         if value not in self.options:
@@ -53,7 +54,7 @@ class BurgerRecipe:
     tomatoes = Number(0, 3)
     cutlets = Number(1, 3)
     eggs = Number(0, 2)
-    sauce = OneOf("ketchup", "mayo", "burger")
+    sauce = OneOf(("ketchup", "mayo", "burger"))
 
     def __init__(
         self,
